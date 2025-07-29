@@ -1,0 +1,55 @@
+services:
+  keeper1:
+    image: clickhouse/clickhouse-keeper:24.1
+    hostname: keeper1
+    container_name: keeper1
+    volumes:
+      - ./configs/keeper/keeper1.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+    ports:
+      - "9181:9181"
+
+  keeper2:
+    image: clickhouse/clickhouse-keeper:24.1
+    hostname: keeper2
+    container_name: keeper2
+    volumes:
+      - ./configs/keeper/keeper2.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+    ports:
+      - "9182:9181"
+
+  keeper3:
+    image: clickhouse/clickhouse-keeper:24.1
+    hostname: keeper3
+    container_name: keeper3
+    volumes:
+      - ./configs/keeper/keeper3.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+    ports:
+      - "9183:9181"
+
+  clickhouse1:
+    image: clickhouse/clickhouse-server:24.1
+    hostname: clickhouse1
+    container_name: clickhouse1
+    depends_on: [keeper1, keeper2, keeper3]
+    ports:
+      - "9000:9000"
+      - "8123:8123"
+    volumes:
+      - ./configs/clickhouse/macros1.xml:/etc/clickhouse-server/config.d/macros.xml:ro
+      - ./configs/clickhouse/use-keeper.xml:/etc/clickhouse-server/config.d/use-keeper.xml:ro
+      - ./configs/clickhouse/remote-servers.xml:/etc/clickhouse-server/config.d/remote-servers.xml:ro
+      - ./configs/clickhouse/network-and-logging1.xml:/etc/clickhouse-server/config.d/network-and-logging.xml:ro
+
+  clickhouse2:
+    image: clickhouse/clickhouse-server:24.1
+    hostname: clickhouse2
+    container_name: clickhouse2
+    depends_on: [keeper1, keeper2, keeper3]
+    ports:
+      - "9001:9000"
+      - "8124:8123"
+    volumes:
+      - ./configs/clickhouse/macros2.xml:/etc/clickhouse-server/config.d/macros.xml:ro
+      - ./configs/clickhouse/use-keeper.xml:/etc/clickhouse-server/config.d/use-keeper.xml:ro
+      - ./configs/clickhouse/remote-servers.xml:/etc/clickhouse-server/config.d/remote-servers.xml:ro
+      - ./configs/clickhouse/network-and-logging2.xml:/etc/clickhouse-server/config.d/network-and-logging.xml:ro
